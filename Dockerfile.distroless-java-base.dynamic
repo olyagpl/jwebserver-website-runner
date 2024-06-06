@@ -1,0 +1,5 @@
+FROM gcr.io/distroless/java-base-debian12
+COPY runner.dynamic /
+COPY site /site
+EXPOSE 8000
+ENTRYPOINT ["/runner.dynamic", "-b", "0.0.0.0", "-d", "/site"]

@@ -1,0 +1,5 @@
+FROM scratch
+COPY runner.static /
+COPY site /site
+EXPOSE 8000
+ENTRYPOINT ["/runner.static", "-b", "0.0.0.0", "-d", "/site"]

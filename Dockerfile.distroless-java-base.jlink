@@ -1,0 +1,5 @@
+FROM gcr.io/distroless/java-base-debian12
+COPY runner-jlink /usr/lib/java
+COPY site /site
+EXPOSE 8000
+ENTRYPOINT ["/usr/lib/java/bin/jwebserver", "-b", "0.0.0.0", "-d", "/site"]
