@@ -11,26 +11,26 @@ The various Dockerfiles copy a native executable or `jlink` generated custom run
 
 * x86 Linux 
 * Docker (or Podman)
-* GraalVM for JDK 21 (`sdk install java 21.0.2-graal`)
+* [GraalVM for JDK 23 Early Access build](https://github.com/graalvm/oracle-graalvm-ea-builds/releases)
 * The `musl` toolchain
 
 ## Setup
 
 1. Clone this repository with Git:
-    ```
+    ```bash
     git clone https://github.com/olyagpl/jwebserver-website-runner.git 
     ```
 
 2. To complete all steps in this demo, you need the following `zlib` packages installed: zlib.x86_64, zlib-devel.x86_64;zlib-static.x86_64. Enter the example directory and run the following script to download and configure the `musl` toolchain, and install `zlib` into the toolchain:
-    ```
+    ```bash
     cd jwebserver-website-runner
     ```
-    ```
+    ```bash
     ./setup-musl.sh
     ```
 
 3. Download [UPX](https://upx.github.io/), an advanced executable file compressor:
-    ```
+    ```bash
     ./setup-upx.sh
     ```
 
@@ -46,7 +46,7 @@ The various Dockerfiles copy a native executable or `jlink` generated custom run
     ./build-dynamic-runner.sh
     ```
 
-3. Build a mostly statically linked executable, by passing `-H:+StaticExecutableWithDynamicLibC` to the `native-image` tool, and package it into a container image that provides `glibc`.
+3. Build a mostly statically linked executable, by passing `--static-nolibc` to the `native-image` tool, and package it into a container image that provides `glibc`.
     ```bash
     ./build-mostly-static-runner.sh
     ```
@@ -94,7 +94,8 @@ ls -lh runner*
 ```bash
 docker images website-runner
 ```
-The website static pages in the _/site_ directory added only 4.0K to the container images size.
+
+> Note that the website static pages added 44M to the container images size!
 
 ### Learn More
 
