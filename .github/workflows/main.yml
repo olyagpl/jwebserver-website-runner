@@ -1,0 +1,69 @@
+name: Github Actions Pipeline
+on: [push, pull_request]
+jobs:
+  build:
+    name: Run Jwebserver
+    runs-on: ubuntu-20.04 # Docker changed its behavior on Ubuntu 22.04
+    timeout-minutes: 30    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up GraalVM
+      uses: graalvm/setup-graalvm@v1
+      with:
+        java-version: '23-ea'
+        distribution: 'graalvm'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup musl toolchain and UPX
+      run: |
+        ./setup-musl.sh
+        ./setup-upx.sh
+    - name: Build fully dynamically linked image (Java Base Distroless)
+      run: |
+        # Dynamic
+        ./build-dynamic-runner.sh
+        container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.dynamic)
+        sleep 5s
+        curl "http://localhost:8000"
+        docker stop $container_id
+    - name: Build mostly static image (Distroless)
+      run: |
+        # Mostly Static
+        ./build-mostly-static-runner.sh
+        container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-base.mostly-static)
+        sleep 5s
+        curl "http://localhost:8000"
+        docker stop $container_id          
+    - name: Build fully static image (Scratch)
+      run: |
+        # Static Scratch
+        ./build-static-runner.sh
+        container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static)
+        sleep 5s
+        curl "http://localhost:8000"
+        docker stop $container_id
+    - name: Build fully static compressed image (Scratch UPX)
+      run: |
+        # Static Scratch UPX
+        ./build-static-compressed-runner.sh
+        container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static-upx)
+        sleep 5s
+        curl "http://localhost:8000"
+        docker stop $container_id
+    - name: Build jlink custom runtime (Java Base Distroless)
+      run: |
+        # jlink
+        ./build-jlink-runner.sh
+        container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.jlink)
+        sleep 5s
+        curl "http://localhost:8000"
+        docker stop $container_id
+    - name: Compare file sizes
+      run: |
+        ls -lh runner*
+        docker images website-runner
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+          name: native-binaries-${{ matrix.os }}
+          path: |
+            runner*
