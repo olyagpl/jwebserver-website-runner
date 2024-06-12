@@ -52,7 +52,7 @@ jobs:
     - name: Build jlink custom runtime (Java Base Distroless)
       run: |
         # jlink
-        ./build-jlink.sh
+        ./build-jlink-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.jlink)
         sleep 5s
         curl "http://localhost:8000"
