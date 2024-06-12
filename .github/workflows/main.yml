@@ -22,7 +22,7 @@ jobs:
         # Dynamic
         ./build-dynamic-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.dynamic)
-        sleep $sleep_period
+        sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
     - name: Build mostly static image (Distroless)
@@ -30,7 +30,7 @@ jobs:
         # Mostly Static
         ./build-mostly-static-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-base.mostly-static)
-        sleep $sleep_period
+        sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id          
     - name: Build fully static image (Scratch)
@@ -38,7 +38,7 @@ jobs:
         # Static Scratch
         ./build-static-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static)
-        sleep $sleep_period
+        sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
     - name: Build fully static compressed image (Scratch UPX)
@@ -46,7 +46,7 @@ jobs:
         # Static Scratch UPX
         ./build-static-compressed-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static-upx)
-        sleep $sleep_period
+        sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
     - name: Build jlink custom runtime (Java Base Distroless)
@@ -54,7 +54,7 @@ jobs:
         # jlink
         ./build-jlink.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.jlink)
-        sleep $sleep_period
+        sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
     - name: Compare file sizes
