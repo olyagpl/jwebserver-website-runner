@@ -16,6 +16,8 @@ jobs:
     - name: Setup musl toolchain and UPX
       run: |
         ./setup-musl.sh
+        export PATH="$PWD/musl-toolchain/bin:$PATH"
+        # Download upx
         ./setup-upx.sh
     - name: Build fully dynamically linked image (Java Base Distroless)
       run: |
