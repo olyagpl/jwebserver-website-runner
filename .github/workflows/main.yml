@@ -13,52 +13,50 @@ jobs:
         java-version: '23-ea'
         distribution: 'graalvm'
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Setup musl toolchain and UPX
+    - name: Run jwebserver-website-runner
       run: |
+        # Setup musl toolchain
         ./setup-musl.sh
+        export PATH="$PWD/musl-toolchain/bin:$PATH"
+        # Download upx
         ./setup-upx.sh
-    - name: Build fully dynamically linked image (Java Base Distroless)
-      run: |
-        # Dynamic
+        #
+        # Build fully dynamically linked image (Java Base Distroless)
         ./build-dynamic-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.dynamic)
         sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
-    - name: Build mostly static image (Distroless)
-      run: |
-        # Mostly Static
+        #
+        # Build mostly static image (Distroless)
         ./build-mostly-static-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-base.mostly-static)
         sleep 5s
         curl "http://localhost:8000"
-        docker stop $container_id          
-    - name: Build fully static image (Scratch)
-      run: |
-        # Static Scratch
+        docker stop $container_id
+        #
+        # Build fully static image (Scratch)
         ./build-static-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static)
         sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
-    - name: Build fully static compressed image (Scratch UPX)
-      run: |
-        # Static Scratch UPX
+        #
+        # Build fully static compressed image (Scratch UPX)
         ./build-static-compressed-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:scratch.static-upx)
         sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
-    - name: Build jlink custom runtime (Java Base Distroless)
-      run: |
-        # jlink
+        #
+        # Build jlink custom runtime (Java Base Distroless)
         ./build-jlink-runner.sh
         container_id=$(docker run -d --rm -p8000:8000 website-runner:distroless-java-base.jlink)
         sleep 5s
         curl "http://localhost:8000"
         docker stop $container_id
-    - name: Compare file sizes
-      run: |
+        #
+        #Compare file sizes
         ls -lh runner*
         docker images website-runner
     - name: Archive production artifacts
